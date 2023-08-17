@@ -1,11 +1,11 @@
 import logging
 import aiohttp
-import tpmodem
-
 import voluptuous as vol
 
 from homeassistant.components.notify import (ATTR_TARGET, PLATFORM_SCHEMA, BaseNotificationService)
 import homeassistant.helpers.config_validation as cv
+
+from .tpmodem import *
 
 TIMEOUT = 3
 LOGIN_TIMEOUT = 300
