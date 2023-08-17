@@ -13,6 +13,9 @@ import binascii
 
 _LOGGER = logging.getLogger(__name__)
 
+TIMEOUT = 3
+LOGIN_TIMEOUT = 300
+
 class Error(Exception):
     """Base class for all exceptions."""
 
