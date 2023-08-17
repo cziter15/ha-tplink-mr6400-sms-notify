@@ -1,0 +1,11 @@
+{
+  "codeowners": [
+    "@cziter15"
+  ],
+  "documentation": "https://github.com/cziter15/",
+  "domain": "MR6400_SMS",
+  "issue_tracker": "https://github.com/cziter15/",
+  "name": "MR6400_SMS",
+  "version": "0.2.0",
+  "requirements": ["aiohttp", "rsa", "binascii"]
+}
