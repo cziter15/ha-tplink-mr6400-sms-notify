@@ -13,19 +13,42 @@ import binascii
 
 import voluptuous as vol
 
-from homeassistant.components.notify import PLATFORM_SCHEMA, BaseNotificationService
-
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Required(CONF_ROUTER_IP, default="192.168.1.1"): cv.string,
-        vol.Required(CONF_ROUTER_PWD, default="admin"): cv.string,
-    }
-)
-
-import homeassistant.helpers.config_validation as cv
+from homeassistant.components.notify import (ATTR_TARGET, PLATFORM_SCHEMA, BaseNotificationService)
 
 TIMEOUT = 3
 LOGIN_TIMEOUT = 300
+
+class Error(Exception):
+    """Base class for all exceptions."""
+
+def rsaEncrypt(data, nn, ee):
+    n = int(nn, 16)
+    e = int(ee, 16)
+    public_key = rsa.PublicKey(n, e)
+    encrypted_data = rsa.encrypt(bytes(data, 'utf-8'), public_key)
+    encrypted_hex = binascii.hexlify(encrypted_data).decode('utf-8')
+    return encrypted_hex
+
+def autologin(function, timeout=TIMEOUT, login_timeout=LOGIN_TIMEOUT):
+    # Decorator that will try to login and redo an action before failing.
+    @wraps(function)
+    async def wrapper(self, *args, **kwargs):
+        try:
+            async with async_timeout.timeout(timeout):
+                return await function(self, *args, **kwargs)
+        except (asyncio.TimeoutError, ClientError, Error):
+            pass
+
+        _LOGGER.debug("autologin")
+        try:
+            async with async_timeout.timeout(login_timeout):
+                await self.login()
+                return await function(self, *args, **kwargs)
+        except (asyncio.TimeoutError, ClientError, Error):
+            raise Error(str(function))
+
+    return wrapper
+
 
 @attr.s
 class MR6400:
@@ -164,26 +187,19 @@ class Modem(MR6400):
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = vol.Schema(vol.All(PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_ROUTER_IP, default="192.168.1.1"): cv.string,
-    vol.Required(CONF_ROUTER_PWD): cv.string,
-})))
-
-
 def get_service(hass, config, discovery_info=None):
-    return MR6400SMSSmsNotificationService(config)
+    return MR6400SMSNotificationService(config)
 
 class MR6400SMSNotificationService(BaseNotificationService):
     """Implementation of a notification service for the MR6400SMS service."""
 
     def __init__(self, config):
         """Initialize the service."""
-        self.router_ip = config[CONF_ROUTER_IP]
-        self.router_pwd = config[CONF_ROUTER_PWD]
+        self.router_ip = "192.168.1.1"
+        self.router_pwd = "kill1212"
 
-    def send_message(self, message="", **kwargs):
-        phone_numbers_str = kwargs['target']
-        phone_numbers = phone_numbers_str.split(',')
+    async def async_send_message(self, message, **kwargs):
+        phone_numbers = kwargs.get(ATTR_TARGET)
 
         async with aiohttp.ClientSession(cookie_jar=aiohttp.CookieJar(unsafe=True)) as websession:
             modem = tpmodem.Modem(hostname=self.router_ip, websession=websession)
@@ -200,4 +216,4 @@ class MR6400SMSNotificationService(BaseNotificationService):
             finally:
                 await self.perform_modem_logout(modem)
                 return web.Response(text='Success')
-                return web.Response(text='Error')
+            return web.Response(text='Error')
