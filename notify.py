@@ -179,7 +179,7 @@ class MR6400SMSNotificationService(BaseNotificationService):
         self.router_ip = config[CONF_ROUTER_IP]
         self.router_pwd = config[CONF_ROUTER_PWD]
 
-    def send_message(self, message="", **kwargs):
+    async def async_send_message(self, message, **kwargs):
         phone_numbers_str = kwargs['target']
         phone_numbers = phone_numbers_str.split(',')
 
