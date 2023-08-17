@@ -4,7 +4,7 @@ from functools import wraps
 from datetime import datetime
 import asyncio
 from aiohttp.client_exceptions import ClientError
-import aiohttp
+
 import async_timeout
 import attr
 import base64
