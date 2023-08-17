@@ -15,9 +15,11 @@ import voluptuous as vol
 
 from homeassistant.components.notify import PLATFORM_SCHEMA, BaseNotificationService
 
-from homeassistant.const import (
-    CONF_ROUTER_IP,
-    CONF_ROUTER_PWD
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+    {
+        vol.Required(CONF_ROUTER_IP, default="192.168.1.1"): cv.string,
+        vol.Required(CONF_ROUTER_PWD, default="admin"): cv.string,
+    }
 )
 
 import homeassistant.helpers.config_validation as cv
@@ -179,7 +181,7 @@ class MR6400SMSNotificationService(BaseNotificationService):
         self.router_ip = config[CONF_ROUTER_IP]
         self.router_pwd = config[CONF_ROUTER_PWD]
 
-    async def async_send_message(self, message, **kwargs):
+    def send_message(self, message="", **kwargs):
         phone_numbers_str = kwargs['target']
         phone_numbers = phone_numbers_str.split(',')
 
