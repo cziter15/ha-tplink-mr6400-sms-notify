@@ -42,19 +42,19 @@ class MR6400SMSNotificationService(BaseNotificationService):
             try:
                 await modem.login(password=password)
                 break  # Successful login, exit retry loop
-            except tpmodem.Error:
+            except Error:
                 retries += 1
                 if retries < MAX_LOGIN_RETRIES:
                     _LOGGER.warning("Retrying modem login...")
                     await asyncio.sleep(1)  # Wait before retrying
                 else:
-                    raise tpmodem.Error("Modem login failed after retries")
+                    raise Error("Modem login failed after retries")
 
     async def async_send_message(self, message, **kwargs):
         phone_numbers = kwargs.get(ATTR_TARGET)
 
         async with aiohttp.ClientSession(cookie_jar=aiohttp.CookieJar(unsafe=True)) as websession:
-            modem = tpmodem.Modem(hostname=self.router_ip, websession=websession)
+            modem = Modem(hostname=self.router_ip, websession=websession)
             try:
                 await self.perform_modem_login(modem, self.router_pwd)
                 for phone in phone_numbers:
