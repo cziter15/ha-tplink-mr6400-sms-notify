@@ -7,8 +7,6 @@ import homeassistant.helpers.config_validation as cv
 
 from .tpmodem import *
 
-TIMEOUT = 3
-LOGIN_TIMEOUT = 300
 MAX_LOGIN_RETRIES = 3
 
 CONF_ROUTER_IP = 'router_ip'
