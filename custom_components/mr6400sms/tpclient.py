@@ -6,6 +6,9 @@ import rsa
 import base64
 import binascii
 
+from asyncio import TimeoutError
+from aiohttp.client_exceptions import ClientError
+
 # Const values
 _LOGIN_TIMEOUT_SECONDS = 5
 
@@ -63,7 +66,7 @@ class MR6400:
                     nnString = nnExp.search(responseText)
                     if nnString:
                         nn = nnString.group(1)   
-        except (asyncio.TimeoutError, acyncio.ClientError, TPCError):
+        except (TimeoutError, ClientError, TPCError):
             raise TPCError("Could not retrieve encryption key")
         
         _LOGGER.debug("ee: {0} nn: {1}".format(ee, nn))  
@@ -99,7 +102,7 @@ class MR6400:
 
                 await self.getToken()
 
-        except (asyncio.TimeoutError, asyncio.ClientError, TPCError):
+        except (TimeoutError, ClientError, TPCError):
             raise TPCError("Could not login")
 
     async def getToken(self):
@@ -120,7 +123,7 @@ class MR6400:
                         _LOGGER.debug("Token id: %s", m.group(1) )
                         self.token = m.group(1) 
 
-        except (asyncio.TimeoutError, asyncio.ClientError, TPCError):
+        except (TimeoutError, ClientError, TPCError):
             raise TPCError("Could not retrieve token")
 
     async def sms(self, phone, message):
