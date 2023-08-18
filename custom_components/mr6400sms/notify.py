@@ -34,8 +34,8 @@ class MR6400SMSNotificationService(BaseNotificationService):
     async def perform_logout(self, tpc):
         try:
             await tpc.logout()
-        except TPCError:
-            _LOGGER.warning("Failed to logout from the TP")
+        except TPCError as e:
+            _LOGGER.error(e)
 
     async def perform_login(self, tpc, websession, password):
         retries = 0
@@ -43,13 +43,13 @@ class MR6400SMSNotificationService(BaseNotificationService):
             try:
                 await tpc.login(websession, ROUTER_USERNAME, password)
                 break  # Successful login, exit retry loop
-            except TPCError:
+            except TPCError as e:
                 retries += 1
                 if retries < MAX_LOGIN_RETRIES:
-                    _LOGGER.warning("Retrying login...")
+                    _LOGGER.warning("Retrying login... " + str(retries) + "of" + str(MAX_LOGIN_RETRIES))
                     await asyncio.sleep(1)  # Wait before retrying
                 else:
-                    raise TPCError("Login failed after retries")
+                    raise TPCError("Login failed after " + str(MAX_LOGIN_RETRIES) + " retries!")
 
     async def async_send_message(self, message, **kwargs):
         phone_numbers = kwargs.get(ATTR_TARGET)
@@ -59,12 +59,9 @@ class MR6400SMSNotificationService(BaseNotificationService):
             try:
                 await self.perform_login(tpc, websession, self.router_pwd)
                 for phone in phone_numbers:
-                    try:
-                        await tpc.sms(phone, message)
-                        _LOGGER.info("Sent SMS to %s: %s", phone, message)
-                    except TPCError:
-                        _LOGGER.error("Unable to send to %s", phone)
+                    await tpc.sms(phone, message)
+                    _LOGGER.info("Sent SMS to %s: %s", phone, message)
             except TPCError as e:
-                _LOGGER.error("Error communicating with MR6400: %s", str(e))
+                _LOGGER.error(e)
             finally:
                 await self.perform_logout(tpc)
