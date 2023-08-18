@@ -37,7 +37,7 @@ class MR6400SMSNotificationService(BaseNotificationService):
         except TPCError:
             _LOGGER.warning("Failed to logout from the TP")
 
-    async def perform_login(self, websession, tpc, password):
+    async def perform_login(self, tpc, websession, password):
         retries = 0
         while retries < MAX_LOGIN_RETRIES:
             try:
