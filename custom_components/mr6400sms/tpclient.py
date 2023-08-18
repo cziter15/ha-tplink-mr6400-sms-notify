@@ -48,7 +48,7 @@ class MR6400:
     async def encryptCredentials(self, username, password):
         try:
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
-                url = self._url('cgi/getParm')
+                url = self.buildUrl('cgi/getParm')
                 headers = { 'Referer': self._baseurl }
 
                 _LOGGER.info(url)
