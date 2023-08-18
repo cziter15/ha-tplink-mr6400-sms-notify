@@ -111,7 +111,7 @@ class MR6400:
 
     async def getToken(self):
         try:
-            async with async_timeout.timeout(LOGIN_TIMEOUT):
+            async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self._url('')
                 _LOGGER.info("Token url %s", url)
                 async with self.websession.get(url) as response:
