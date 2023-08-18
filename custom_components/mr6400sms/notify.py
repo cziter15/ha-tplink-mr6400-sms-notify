@@ -55,9 +55,9 @@ class MR6400SMSNotificationService(BaseNotificationService):
         phone_numbers = kwargs.get(ATTR_TARGET)
 
         async with aiohttp.ClientSession(cookie_jar=aiohttp.CookieJar(unsafe=True)) as websession:
-            tpc = MR6400(self.router_ip, websession)
+            tpc = MR6400(self.router_ip)
             try:
-                await self.perform_login(tpc, self.router_pwd)
+                await self.perform_login(tpc, websession, self.router_pwd)
                 for phone in phone_numbers:
                     try:
                         await tpc.sms(phone, message)
