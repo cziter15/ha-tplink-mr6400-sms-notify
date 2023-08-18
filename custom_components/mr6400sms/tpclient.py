@@ -20,7 +20,7 @@ class TPCError(Exception):
         _LOGGER.error(msg)
 
 class MR6400:
-    def __init__(self, hostname, websession):
+    def __init__(self, hostname):
         self.hostname = hostname
         self.token = None
         self._encryptedUsername = None
