@@ -22,7 +22,6 @@ class TPCError(Exception):
 class MR6400:
     def __init__(self, hostname, websession):
         self.hostname = hostname
-        self.websession = websession
         self.token = None
         self._encryptedUsername = None
         self._encryptedPassword = None
@@ -78,8 +77,9 @@ class MR6400:
         await asyncio.sleep(0.1)
 
     
-    async def login(self, username, password):
+    async def login(self, websession, username, password):
         try:
+            self.websession = websession
             await self.encryptCredentials(username, password)
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self.buildUrl('cgi/login')
@@ -101,6 +101,7 @@ class MR6400:
                 await self.getToken()
 
         except (TimeoutError, ClientError, TPCError):
+            self.websession = None
             raise TPCError("Could not login")
 
     async def getToken(self):
