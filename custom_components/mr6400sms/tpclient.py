@@ -23,14 +23,12 @@ class MR6400:
     def __init__(self, hostname, websession):
         self.hostname = hostname
         self.websession = websession
+        self.token = None
         self._encryptedUsername = None
         self._encryptedPassword = None
-        self.token = None
+        self._baseurl = "http://{}/".format(self.hostname)
 
-    def _baseurl(self):
-        return "http://{}/".format(self.hostname)
-
-    def _url(self, path):
+    def buildUrl(self, path):
         return self._baseurl + path
 
     async def logout(self):
@@ -84,7 +82,7 @@ class MR6400:
         try:
             await self.encryptCredentials(username, password)
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
-                url = self._url('cgi/login')
+                url = self.buildUrl('cgi/login')
                 params = {'UserName': self._encryptedUsername, 'Passwd': self._encryptedPassword, 'Action': '1', 'LoginStatus':'0' }
                 headers= { 'Referer': self._baseurl }
 
@@ -108,7 +106,7 @@ class MR6400:
     async def getToken(self):
         try:
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
-                url = self._url('')
+                url = self.buildUrl('')
                 _LOGGER.info("Token url %s", url)
                 async with self.websession.get(url) as response:
                     if response.status != 200:
@@ -127,7 +125,7 @@ class MR6400:
             raise TPCError("Could not retrieve token")
 
     async def sms(self, phone, message):
-        url = self._url('cgi')
+        url = self.buildUrl('cgi')
         params = { '2': '' }
         data = "[LTE_SMS_SENDNEWMSG#0,0,0,0,0,0#0,0,0,0,0,0]0,3\r\nindex=1\r\nto={0}\r\ntextContent={1}\r\n".format(phone, message)
         headers= { 'Referer': self._baseurl, 'TokenID': self.token }
