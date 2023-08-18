@@ -46,10 +46,10 @@ class MR6400SMSNotificationService(BaseNotificationService):
             except TPCError as e:
                 retries += 1
                 if retries < MAX_LOGIN_RETRIES:
-                    _LOGGER.warning("Retrying login... " + str(retries) + "of" + str(MAX_LOGIN_RETRIES))
+                    _LOGGER.warning("Retrying login (%d of %d) due to exception {%s}", retries, MAX_LOGIN_RETRIES, e)
                     await asyncio.sleep(1)  # Wait before retrying
                 else:
-                    raise TPCError("Login failed after " + str(MAX_LOGIN_RETRIES) + " retries!")
+                    raise TPCError("Login failed due to reaching max retry limit!")
 
     async def async_send_message(self, message, **kwargs):
         phone_numbers = kwargs.get(ATTR_TARGET)
