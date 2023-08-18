@@ -4,9 +4,9 @@
   ],
   "documentation": "https://github.com/cziter15/ha-tplink-mr6400-sms-notify",
   "domain": "mr6400sms",
-  "name": "mr6400sms",
-  "version": "0.0.1",
-  "requirements": ["rsa"],
+  "iot_class": "local_polling",
   "integration_type": "service",
-  "iot_class": "local_polling"
+  "name": "mr6400sms",
+  "requirements": ["rsa"],  
+  "version": "0.0.1"
 }
