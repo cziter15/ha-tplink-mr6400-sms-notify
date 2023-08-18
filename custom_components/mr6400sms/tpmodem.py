@@ -1,5 +1,4 @@
 import logging
-import attr
 import asyncio
 import async_timeout
 import re
@@ -19,14 +18,13 @@ class ModemError(Exception):
     def __init__(self, msg=''):
         _LOGGER.error(msg)
 
-@attr.s
 class MR6400:
-    hostname = attr.ib()
-    websession = attr.ib()
-    token = attr.ib(default=None)
+    hostname = None
+    websession = None
+    token = None
 
-    _encryptedUsername = None;
-    _encryptedPassword = None;
+    _encryptedUsername = None
+    _encryptedPassword = None
 
     @property
     def _baseurl(self):
