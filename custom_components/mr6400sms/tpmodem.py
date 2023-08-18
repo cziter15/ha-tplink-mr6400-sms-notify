@@ -63,7 +63,7 @@ class MR6400:
                 _LOGGER.info(url)
                 async with self.websession.post(url, headers=headers) as response:
                     if response.status != 200:
-                        raise ModemError("Invalid encryption key request, status: " + response.status)
+                        raise ModemError("Invalid encryption key request, status: " + str(response.status))
                     responseText = await response.text()
                     eeExp = re.compile(r'(?<=ee=")(.{5}(?:\s|.))', re.IGNORECASE)
                     eeString = eeExp.search(responseText)
@@ -119,7 +119,7 @@ class MR6400:
                 _LOGGER.info("Token url %s", url)
                 async with self.websession.get(url) as response:
                     if response.status != 200:
-                        raise ModemError("Invalid token request, status: " + response.status)
+                        raise ModemError("Invalid token request, status: " + str(response.status))
                     else:
                         _LOGGER.debug("Valid token request")
                     # parse the html response to find the token
