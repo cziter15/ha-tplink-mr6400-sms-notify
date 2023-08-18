@@ -52,7 +52,7 @@ class MR6400:
 
     async def encryptString(self, value, nn, ee):
         value64 = base64.b64encode(value.encode("utf-8"))
-        return encryptDataRSA(value64.decode('UTF-8'), nn, ee)    
+        return self.encryptDataRSA(value64.decode('UTF-8'), nn, ee)    
 
     async def encryptCredentials(self, password, username):
         try:
