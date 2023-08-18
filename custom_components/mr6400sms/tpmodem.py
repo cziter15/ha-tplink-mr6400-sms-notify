@@ -23,9 +23,6 @@ class ModemError(Exception):
 class MR6400:
     hostname = attr.ib()
     websession = attr.ib()
-
-    username = attr.ib(default="admin")
-    password = attr.ib(default=None)
     token = attr.ib(default=None)
 
     _encryptedUsername = None;
@@ -54,7 +51,7 @@ class MR6400:
         value64 = base64.b64encode(value.encode("utf-8"))
         return self.encryptDataRSA(value64.decode('UTF-8'), nn, ee)    
 
-    async def encryptCredentials(self, password, username):
+    async def encryptCredentials(self, username, password):
         try:
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self._url('cgi/getParm')
@@ -87,9 +84,9 @@ class MR6400:
         await asyncio.sleep(0.1)
 
     
-    async def login(self, password, username):
+    async def login(self, username, password):
         try:
-            await self.encryptCredentials(password, username)
+            await self.encryptCredentials(username, password)
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self._url('cgi/login')
                 params = {'UserName': self._encryptedUsername, 'Passwd': self._encryptedPassword, 'Action': '1', 'LoginStatus':'0' }
