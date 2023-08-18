@@ -67,4 +67,4 @@ class MR6400SMSNotificationService(BaseNotificationService):
             except TPCError as e:
                 _LOGGER.error("Error communicating with MR6400: %s", str(e))
             finally:
-                await self.perform_logout(client)
+                await self.perform_logout(tpc)
