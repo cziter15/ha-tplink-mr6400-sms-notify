@@ -40,16 +40,14 @@ class MR6400:
         self.token = None
 
     def encryptDataRSA(self, data, nn, ee):
-        n = int(nn, 16)
-        e = int(ee, 16)
-        public_key = rsa.PublicKey(n, e)
-        encrypted_data = rsa.encrypt(bytes(data, 'utf-8'), public_key)
+        public_key = rsa.PublicKey(int(nn, 16), int(ee,16))
+        encrypted_data = rsa.encrypt(data, public_key)
         encrypted_hex = binascii.hexlify(encrypted_data).decode('utf-8')
         return encrypted_hex
 
     async def encryptString(self, value, nn, ee):
-        value64 = base64.b64encode(value.encode("utf-8"))
-        return self.encryptDataRSA(value64.decode('UTF-8'), nn, ee)    
+        encoded = base64.b64encode(value.encode("utf-8"))
+        return self.encryptDataRSA(encoded, nn, ee)    
 
     async def encryptCredentials(self, username, password):
         try:
