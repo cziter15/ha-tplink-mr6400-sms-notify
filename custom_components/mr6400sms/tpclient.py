@@ -16,8 +16,6 @@ _LOGIN_TIMEOUT_SECONDS = 5
 _LOGGER = logging.getLogger(__name__)
 
 class TPCError(Exception):
-    def __init__(self, msg=''):
-        _LOGGER.error(msg)
 
 class MR6400:
     def __init__(self, hostname):
