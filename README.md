@@ -1,9 +1,8 @@
 # mr6400sms
 This is HomeAssistant HACS integration that works a lot faster than tp-connected due to eliminated js2py based cryptography.
-
 This code however is based on tp-connected.
 
-## In your configuration yaml add this:
+## In your configuration.yaml add this:
 ```yaml
 notify:
   - platform: mr6400sms
