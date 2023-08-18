@@ -6,27 +6,24 @@ import rsa
 import base64
 import binascii
 
-from functools import wraps
-from datetime import datetime
-from aiohttp.client_exceptions import ClientError
-
+# Const values
 _LOGIN_TIMEOUT_SECONDS = 5
 
+# Logger
 _LOGGER = logging.getLogger(__name__)
 
-class ModemError(Exception):
+class TPCError(Exception):
     def __init__(self, msg=''):
         _LOGGER.error(msg)
 
 class MR6400:
-    hostname = None
-    websession = None
-    token = None
+    def __init__(self, hostname, websession):
+        self.hostname = hostname
+        self.websession = websession
+        self._encryptedUsername = None
+        self._encryptedPassword = None
+        self.token = None
 
-    _encryptedUsername = None
-    _encryptedPassword = None
-
-    @property
     def _baseurl(self):
         return "http://{}/".format(self.hostname)
 
@@ -66,7 +63,7 @@ class MR6400:
                     nnString = nnExp.search(responseText)
                     if nnString:
                         nn = nnString.group(1)   
-        except (asyncio.TimeoutError, ClientError, ModemError):
+        except (asyncio.TimeoutError, acyncio.ClientError, ModemError):
             raise ModemError("Could not retrieve encryption key")
         
         _LOGGER.debug("ee: {0} nn: {1}".format(ee, nn))  
@@ -102,7 +99,7 @@ class MR6400:
 
                 await self.getToken()
 
-        except (asyncio.TimeoutError, ClientError, ModemError):
+        except (asyncio.TimeoutError, asyncio.ClientError, ModemError):
             raise ModemError("Could not login")
 
     async def getToken(self):
@@ -123,7 +120,7 @@ class MR6400:
                         _LOGGER.debug("Token id: %s", m.group(1) )
                         self.token = m.group(1) 
 
-        except (asyncio.TimeoutError, ClientError, ModemError):
+        except (asyncio.TimeoutError, asyncio.ClientError, ModemError):
             raise ModemError("Could not retrieve token")
 
     async def sms(self, phone, message):
@@ -134,6 +131,3 @@ class MR6400:
         async with self.websession.post(url, params=params, data=data, headers=headers) as response:
             if response.status != 200:
                 raise ModemError("Failed sending SMS")
-
-class Modem(MR6400):
-    """Class for any modem."""
