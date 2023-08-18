@@ -2,9 +2,8 @@
   "codeowners": [
     "@cziter15"
   ],
-  "documentation": "https://github.com/cziter15/",
+  "documentation": "https://github.com/cziter15/ha-tplink-mr6400-sms-notify",
   "domain": "mr6400sms",
-  "issue_tracker": "https://github.com/cziter15/",
   "name": "mr6400sms",
   "version": "0.0.1",
   "requirements": ["aiohttp>=3.0.0", "rsa"]
