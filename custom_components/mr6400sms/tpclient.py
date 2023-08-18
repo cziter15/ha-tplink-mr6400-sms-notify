@@ -53,7 +53,7 @@ class MR6400:
                 _LOGGER.info(url)
                 async with self.websession.post(url, headers=headers) as response:
                     if response.status != 200:
-                        raise ModemError("Invalid encryption key request, status: " + str(response.status))
+                        raise TPCError("Invalid encryption key request, status: " + str(response.status))
                     responseText = await response.text()
                     eeExp = re.compile(r'(?<=ee=")(.{5}(?:\s|.))', re.IGNORECASE)
                     eeString = eeExp.search(responseText)
@@ -63,8 +63,8 @@ class MR6400:
                     nnString = nnExp.search(responseText)
                     if nnString:
                         nn = nnString.group(1)   
-        except (asyncio.TimeoutError, acyncio.ClientError, ModemError):
-            raise ModemError("Could not retrieve encryption key")
+        except (asyncio.TimeoutError, acyncio.ClientError, TPCError):
+            raise TPCError("Could not retrieve encryption key")
         
         _LOGGER.debug("ee: {0} nn: {1}".format(ee, nn))  
         
@@ -88,19 +88,19 @@ class MR6400:
                 _LOGGER.info(url)
                 async with self.websession.post(url, params=params, headers=headers) as response:
                     if response.status != 200:
-                        raise ModemError("Invalid login request")
+                        raise TPCError("Invalid login request")
                     hasSessionId = False
                     for cookie in self.websession.cookie_jar:
                         if cookie["domain"] == self.hostname and cookie.key == 'JSESSIONID':
                             hasSessionId = True
                             _LOGGER.debug("Session id: %s", cookie.value)
                     if not hasSessionId:
-                        raise ModemError("Inavalid credentials")
+                        raise TPCError("Inavalid credentials")
 
                 await self.getToken()
 
-        except (asyncio.TimeoutError, asyncio.ClientError, ModemError):
-            raise ModemError("Could not login")
+        except (asyncio.TimeoutError, asyncio.ClientError, TPCError):
+            raise TPCError("Could not login")
 
     async def getToken(self):
         try:
@@ -109,7 +109,7 @@ class MR6400:
                 _LOGGER.info("Token url %s", url)
                 async with self.websession.get(url) as response:
                     if response.status != 200:
-                        raise ModemError("Invalid token request, status: " + str(response.status))
+                        raise TPCError("Invalid token request, status: " + str(response.status))
                     else:
                         _LOGGER.debug("Valid token request")
                     # parse the html response to find the token
@@ -120,8 +120,8 @@ class MR6400:
                         _LOGGER.debug("Token id: %s", m.group(1) )
                         self.token = m.group(1) 
 
-        except (asyncio.TimeoutError, asyncio.ClientError, ModemError):
-            raise ModemError("Could not retrieve token")
+        except (asyncio.TimeoutError, asyncio.ClientError, TPCError):
+            raise TPCError("Could not retrieve token")
 
     async def sms(self, phone, message):
         url = self._url('cgi')
@@ -130,4 +130,4 @@ class MR6400:
         headers= { 'Referer': self._baseurl, 'TokenID': self.token }
         async with self.websession.post(url, params=params, data=data, headers=headers) as response:
             if response.status != 200:
-                raise ModemError("Failed sending SMS")
+                raise TPCError("Failed sending SMS")
