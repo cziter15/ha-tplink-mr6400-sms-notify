@@ -42,7 +42,7 @@ class MR6400:
         self.websession = None
         self.token = None
 
-    def encryptDataRSA(data, nn, ee):
+    def encryptDataRSA(self, data, nn, ee):
         n = int(nn, 16)
         e = int(ee, 16)
         public_key = rsa.PublicKey(n, e)
