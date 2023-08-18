@@ -1,7 +1,6 @@
-"""The MR6400_SMS component."""
+"""The mr6400sms component."""
 
-DOMAIN = "MR6400_SMS"
-
+DOMAIN = "mr6400sms"
 
 def setup(hass, config):
     # Return boolean to indicate that initialization was successful.

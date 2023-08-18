@@ -7,6 +7,7 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.components.notify import (ATTR_TARGET, PLATFORM_SCHEMA, BaseNotificationService)
 
 MAX_LOGIN_RETRIES = 3
+ROUTER_USERNAME = "admin"
 
 CONF_ROUTER_IP = 'router_ip'
 CONF_ROUTER_PWD = 'router_pwd'
@@ -36,7 +37,7 @@ class MR6400SMSNotificationService(BaseNotificationService):
         retries = 0
         while retries < MAX_LOGIN_RETRIES:
             try:
-                await modem.login(password=password)
+                await modem.login(ROUTER_USERNAME, password)
                 break  # Successful login, exit retry loop
             except ModemError:
                 retries += 1

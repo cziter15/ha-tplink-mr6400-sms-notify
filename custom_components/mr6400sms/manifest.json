@@ -3,9 +3,9 @@
     "@cziter15"
   ],
   "documentation": "https://github.com/cziter15/",
-  "domain": "MR6400_SMS",
+  "domain": "mr6400sms",
   "issue_tracker": "https://github.com/cziter15/",
-  "name": "MR6400_SMS",
-  "version": "0.2.0",
+  "name": "mr6400sms",
+  "version": "0.0.1",
   "requirements": ["aiohttp>=3.0.0", "rsa"]
 }
