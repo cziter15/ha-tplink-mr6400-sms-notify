@@ -23,3 +23,8 @@ data:
     - number1
     - number2
 ```
+## TODOs:
+- Implement outbox cleanup
+- Implement UI based config
+- Cleanup and comment the code
+- Fix validation warnings
