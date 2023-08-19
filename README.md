@@ -27,4 +27,5 @@ data:
 - Implement outbox cleanup
 - Implement UI based config
 - Cleanup and comment the code
+- Add a function to remove specoal characters from the message
 - Fix validation warnings
