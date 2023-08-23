@@ -16,7 +16,8 @@ notify:
     router_ip: <IP of the router>
     router_pwd: <admin password>
 ```
-Replace `<IP of the router>` with the actual IP address of your TP-Link MR6400 router, and `<admin password>` with your router's administrator password.
+2. Replace `<IP of the router>` with the actual IP address of your TP-Link MR6400 router.
+3. Replace `<admin password>` with your router's administrator password.
 
 ## Using the Service
 Once you've configured the integration, you can call the service to send SMS messages. Here are some key points to note:
