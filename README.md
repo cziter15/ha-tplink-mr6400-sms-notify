@@ -1,4 +1,6 @@
 # TP-Link MR6400 SMS Notify - mr6400sms
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration) [![Validate with hassfest](https://github.com/cziter15/ha-tplink-mr6400-sms-notify/actions/workflows/hassfest.yml/badge.svg)](https://github.com/cziter15/ha-tplink-mr6400-sms-notify/actions/workflows/hassfest.yml)
+
 This is HomeAssistant HACS integration that works a lot faster than tp-connected due to eliminated js2py based cryptography.
 This code however is based on tp-connected.
 
