@@ -1,4 +1,3 @@
-import logging
 import asyncio
 import async_timeout
 import re
@@ -11,9 +10,6 @@ from aiohttp.client_exceptions import ClientError
 
 # Const values
 _LOGIN_TIMEOUT_SECONDS = 5
-
-# Logger
-_LOGGER = logging.getLogger(__name__)
 
 class TPCError(Exception):
     pass
@@ -43,11 +39,11 @@ class MR6400:
         encoded = base64.b64encode(value.encode("utf-8"))
         return self.encryptDataRSA(encoded, nn, ee)    
 
-   async def extract_key_part(responseText, pattern):
-    exp = re.compile(pattern, re.IGNORECASE)
-    match = exp.search(responseText)
-    return match.group(1) if match else None
-
+    async def extract_key_part(responseText, pattern):
+        exp = re.compile(pattern, re.IGNORECASE)
+        match = exp.search(responseText)
+        return match.group(1) if match else None
+    
     async def encryptCredentials(self, username, password):
         try:
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
@@ -62,7 +58,7 @@ class MR6400:
                     nn = await extract_key_part(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
                     self._encryptedUsername = await self.encryptString(username, nn, ee)
                     self._encryptedPassword = await self.encryptString(password, nn, ee)
-
+    
         except (TimeoutError, ClientError, TPCError):
             raise TPCError("Could not retrieve encryption key")
     
@@ -96,7 +92,6 @@ class MR6400:
         try:
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self.buildUrl('')
-                _LOGGER.info("Token url %s", url)
                 async with self.websession.get(url) as response:
                     if response.status != 200:
                         raise TPCError("Invalid token request, status: " + str(response.status))
