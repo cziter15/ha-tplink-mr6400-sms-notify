@@ -72,8 +72,8 @@ class MR6400:
             async with self.websession.post(url, params=params, headers=headers) as response:
                 if response.status != 200:
                     raise TPCError("Invalid login request")
-                for cookie in response.cookies:
-                    if cookie.key == 'JSESSIONID' and cookie['domain'] == self.hostname:
+                for cookie in self.websession.cookie_jar:
+                    if cookie["domain"] == self.hostname and cookie.key == 'JSESSIONID':
                         return
                 raise TPCError("Invalid credentials")
         except (TimeoutError, ClientError, TPCError) as e:
