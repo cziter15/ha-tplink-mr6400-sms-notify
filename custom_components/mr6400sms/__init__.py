@@ -1,5 +1,6 @@
-DOMAIN = "mr6400sms"
+"""
+This is a directory with Python code for the MR6400 SMS integration.
 
-def setup(hass, config):
-    # Return boolean to indicate that initialization was successful.
-    return True
+The service is defined inside the notify.py function.
+The router client is implemented in tpclient.py.
+"""
