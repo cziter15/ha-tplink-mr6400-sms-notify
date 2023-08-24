@@ -72,16 +72,13 @@ class MR6400:
             async with self.websession.post(url, params=params, headers=headers) as response:
                 if response.status != 200:
                     raise TPCError("Invalid login request")
-                hasSessionCookie = False
                 for cookie in response.cookies:
                     if cookie.key == 'JSESSIONID' and cookie['domain'] == self.hostname:
-                        hasSessionCookie = True
-                        break
-                if not hasSessionCookie:
-                    raise TPCError("Invalid credentials")
-        except (TimeoutError, ClientError, TPCError):
+                        return
+                raise TPCError("Invalid credentials")
+        except (TimeoutError, ClientError, TPCError) as e:
             self.websession = None
-            raise TPCError("Could not login")
+            raise TPCError("Could not login, reason: " +  str(e))
 
     async def getToken(self):
         try:
