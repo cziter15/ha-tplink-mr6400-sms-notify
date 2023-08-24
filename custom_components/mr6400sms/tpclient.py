@@ -39,7 +39,7 @@ class MR6400:
         encoded = base64.b64encode(value.encode("utf-8"))
         return self.encryptDataRSA(encoded, nn, ee)    
 
-    async def extract_key_part(responseText, pattern):
+    async def extract_key_part(self, responseText, pattern):
         exp = re.compile(pattern, re.IGNORECASE)
         match = exp.search(responseText)
         return match.group(1) if match else None
@@ -53,8 +53,8 @@ class MR6400:
                     if response.status != 200:
                         raise TPCError("Invalid encryption key request, status: " + str(response.status))
                     responseText = await response.text()
-                    ee = await extract_key_part(responseText, r'(?<=ee=")(.{5}(?:\s|.))')
-                    nn = await extract_key_part(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
+                    ee = await extract_key_part(self, responseText, r'(?<=ee=")(.{5}(?:\s|.))')
+                    nn = await extract_key_part(self, responseText, r'(?<=nn=")(.{255}(?:\s|.))')
                     self._encryptedUsername = await self.encryptString(username, nn, ee)
                     self._encryptedPassword = await self.encryptString(password, nn, ee)
         except (TimeoutError, ClientError, TPCError):
