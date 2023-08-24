@@ -92,8 +92,8 @@ class MR6400:
                     m = p.search(responseText)
                     if m:
                         self.token = m.group(1) 
-        except (TimeoutError, ClientError, TPCError):
-            raise TPCError("Could not retrieve token")
+        except (TimeoutError, ClientError, TPCError) as e:
+            raise TPCError("Could not retrieve token, reason: " +  str(e))
 
     async def sms(self, phone, message):
         url = self.buildUrl('cgi')
