@@ -62,6 +62,7 @@ class MR6400:
     
     async def login(self, websession, username, password):
         try:
+            await self.logout()
             self.websession = websession
             await self.encryptCredentials(username, password)
             await asyncio.sleep(0.1)
