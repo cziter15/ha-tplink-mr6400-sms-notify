@@ -49,7 +49,6 @@ class MR6400:
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self.buildUrl('cgi/getParm')
                 headers = {'Referer': self._baseurl}
-                
                 async with self.websession.post(url, headers=headers) as response:
                     if response.status != 200:
                         raise TPCError("Invalid encryption key request, status: " + str(response.status))
@@ -58,7 +57,6 @@ class MR6400:
                     nn = await extract_key_part(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
                     self._encryptedUsername = await self.encryptString(username, nn, ee)
                     self._encryptedPassword = await self.encryptString(password, nn, ee)
-    
         except (TimeoutError, ClientError, TPCError):
             raise TPCError("Could not retrieve encryption key")
     
@@ -70,20 +68,14 @@ class MR6400:
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self.buildUrl('cgi/login')
                 params = {'UserName': self._encryptedUsername, 'Passwd': self._encryptedPassword, 'Action': '1', 'LoginStatus':'0' }
-                headers= { 'Referer': self._baseurl }
-
-                async with self.websession.post(url, params=params, headers=headers) as response:
-                    if response.status != 200:
-                        raise TPCError("Invalid login request")
-                    hasSessionId = False
-                    for cookie in self.websession.cookie_jar:
-                        if cookie["domain"] == self.hostname and cookie.key == 'JSESSIONID':
-                            hasSessionId = True
-                    if not hasSessionId:
-                        raise TPCError("Inavalid credentials")
-
+                headers = { 'Referer': self._baseurl }
+            async with self.websession.post(url, params=params, headers=headers) as response:
+                if response.status != 200:
+                    raise TPCError("Invalid login request")
+                jsessionid_cookie = response.cookies.get('JSESSIONID', domain=self.hostname)
+                if not jsessionid_cookie:
+                    raise TPCError("Invalid credentials")
                 await self.getToken()
-
         except (TimeoutError, ClientError, TPCError):
             self.websession = None
             raise TPCError("Could not login")
