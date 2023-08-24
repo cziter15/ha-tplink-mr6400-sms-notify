@@ -43,49 +43,39 @@ class MR6400:
         encoded = base64.b64encode(value.encode("utf-8"))
         return self.encryptDataRSA(encoded, nn, ee)    
 
+   async def extract_key_part(responseText, pattern):
+    exp = re.compile(pattern, re.IGNORECASE)
+    match = exp.search(responseText)
+    return match.group(1) if match else None
+
     async def encryptCredentials(self, username, password):
         try:
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self.buildUrl('cgi/getParm')
-                headers = { 'Referer': self._baseurl }
-
-                _LOGGER.info(url)
+                headers = {'Referer': self._baseurl}
+                
                 async with self.websession.post(url, headers=headers) as response:
                     if response.status != 200:
                         raise TPCError("Invalid encryption key request, status: " + str(response.status))
                     responseText = await response.text()
-                    eeExp = re.compile(r'(?<=ee=")(.{5}(?:\s|.))', re.IGNORECASE)
-                    eeString = eeExp.search(responseText)
-                    if eeString:
-                        ee = eeString.group(1) 
-                    nnExp = re.compile(r'(?<=nn=")(.{255}(?:\s|.))', re.IGNORECASE)
-                    nnString = nnExp.search(responseText)
-                    if nnString:
-                        nn = nnString.group(1)   
+                    ee = await extract_key_part(responseText, r'(?<=ee=")(.{5}(?:\s|.))')
+                    nn = await extract_key_part(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
+                    self._encryptedUsername = await self.encryptString(username, nn, ee)
+                    self._encryptedPassword = await self.encryptString(password, nn, ee)
+
         except (TimeoutError, ClientError, TPCError):
             raise TPCError("Could not retrieve encryption key")
-        
-        _LOGGER.debug("ee: {0} nn: {1}".format(ee, nn))  
-        
-        self._encryptedUsername = await self.encryptString(username, nn, ee)
-        _LOGGER.debug("Encrypted username: {0}".format(self._encryptedUsername))
-
-        self._encryptedPassword = await self.encryptString(password, nn, ee)
-        _LOGGER.debug("Encrypted password: {0}".format(self._encryptedPassword))
-
-        await asyncio.sleep(0.1)
-
     
     async def login(self, websession, username, password):
         try:
             self.websession = websession
             await self.encryptCredentials(username, password)
+            await asyncio.sleep(0.1)
             async with async_timeout.timeout(_LOGIN_TIMEOUT_SECONDS):
                 url = self.buildUrl('cgi/login')
                 params = {'UserName': self._encryptedUsername, 'Passwd': self._encryptedPassword, 'Action': '1', 'LoginStatus':'0' }
                 headers= { 'Referer': self._baseurl }
 
-                _LOGGER.info(url)
                 async with self.websession.post(url, params=params, headers=headers) as response:
                     if response.status != 200:
                         raise TPCError("Invalid login request")
@@ -93,7 +83,6 @@ class MR6400:
                     for cookie in self.websession.cookie_jar:
                         if cookie["domain"] == self.hostname and cookie.key == 'JSESSIONID':
                             hasSessionId = True
-                            _LOGGER.debug("Session id: %s", cookie.value)
                     if not hasSessionId:
                         raise TPCError("Inavalid credentials")
 
@@ -111,16 +100,11 @@ class MR6400:
                 async with self.websession.get(url) as response:
                     if response.status != 200:
                         raise TPCError("Invalid token request, status: " + str(response.status))
-                    else:
-                        _LOGGER.debug("Valid token request")
-                    # parse the html response to find the token
                     responseText = await response.text()
                     p = re.compile(r'(?<=token=")(.{29}(?:\s|.))', re.IGNORECASE)
                     m = p.search(responseText)
                     if m:
-                        _LOGGER.debug("Token id: %s", m.group(1) )
                         self.token = m.group(1) 
-
         except (TimeoutError, ClientError, TPCError):
             raise TPCError("Could not retrieve token")
 
