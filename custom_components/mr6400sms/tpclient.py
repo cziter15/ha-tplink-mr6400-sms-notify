@@ -39,7 +39,7 @@ class MR6400:
         encoded = base64.b64encode(value.encode("utf-8"))
         return self.encryptDataRSA(encoded, nn, ee)    
 
-    async def extract_key_part(self, responseText, pattern):
+    async def extractKeyPart(self, responseText, pattern):
         exp = re.compile(pattern, re.IGNORECASE)
         match = exp.search(responseText)
         return match.group(1) if match else None
@@ -53,8 +53,8 @@ class MR6400:
                     if response.status != 200:
                         raise TPCError("Invalid encryption key request, status: " + str(response.status))
                     responseText = await response.text()
-                    ee = await self.extract_key_part(responseText, r'(?<=ee=")(.{5}(?:\s|.))')
-                    nn = await self.extract_key_part(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
+                    ee = await self.extractKeyPart(responseText, r'(?<=ee=")(.{5}(?:\s|.))')
+                    nn = await self.extractKeyPart(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
                     self._encryptedUsername = await self.encryptString(username, nn, ee)
                     self._encryptedPassword = await self.encryptString(password, nn, ee)
         except (TimeoutError, ClientError, TPCError):
@@ -72,10 +72,13 @@ class MR6400:
             async with self.websession.post(url, params=params, headers=headers) as response:
                 if response.status != 200:
                     raise TPCError("Invalid login request")
-                jsessionid_cookie = response.cookies.get('JSESSIONID', domain=self.hostname)
-                if not jsessionid_cookie:
+                hasSessionCookie = False
+                for cookie in response.cookies:
+                    if cookie.key == 'JSESSIONID' and cookie['domain'] == self.hostname:
+                        hasSessionCookie = True
+                        break
+                if not hasSessionCookie:
                     raise TPCError("Invalid credentials")
-                await self.getToken()
         except (TimeoutError, ClientError, TPCError):
             self.websession = None
             raise TPCError("Could not login")
