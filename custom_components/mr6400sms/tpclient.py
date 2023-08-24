@@ -51,14 +51,14 @@ class MR6400:
                 headers = {'Referer': self._baseurl}
                 async with self.websession.post(url, headers=headers) as response:
                     if response.status != 200:
-                        raise TPCError("Invalid encryption key request, status: " + str(response.status))
+                        raise TPCError("Invalid encryption key request beause of status " + str(response.status))
                     responseText = await response.text()
                     ee = self.extractKeyPart(responseText, r'(?<=ee=")(.{5}(?:\s|.))')
                     nn = self.extractKeyPart(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
                     self._encryptedUsername = self.encryptString(username, nn, ee)
                     self._encryptedPassword = self.encryptString(password, nn, ee)
         except (TimeoutError, ClientError, TPCError) as e:
-            raise TPCError("Could not retrieve encryption key, reason: " +  str(e))
+            raise TPCError("Could not retrieve encryption key due to " +  str(e))
     
     async def login(self, websession, username, password):
         try:
@@ -79,7 +79,7 @@ class MR6400:
                     raise TPCError("Invalid credentials")
         except (TimeoutError, ClientError, TPCError) as e:
             self.websession = None
-            raise TPCError("Could not login, reason: " +  str(e))
+            raise TPCError("Could not login due to " +  str(e))
 
     async def getToken(self):
         try:
@@ -87,14 +87,14 @@ class MR6400:
                 url = self.buildUrl('')
                 async with self.websession.get(url) as response:
                     if response.status != 200:
-                        raise TPCError("Invalid token request, status: " + str(response.status))
+                        raise TPCError("Invalid token request because of status " + str(response.status))
                     responseText = await response.text()
                     p = re.compile(r'(?<=token=")(.{29}(?:\s|.))', re.IGNORECASE)
                     m = p.search(responseText)
                     if m:
                         self.token = m.group(1) 
         except (TimeoutError, ClientError, TPCError) as e:
-            raise TPCError("Could not retrieve token, reason: " +  str(e))
+            raise TPCError("Could not retrieve token due to " +  str(e))
 
     async def sms(self, phone, message):
         url = self.buildUrl('cgi')
