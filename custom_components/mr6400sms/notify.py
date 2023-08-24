@@ -6,21 +6,21 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.components.notify import (ATTR_TARGET, PLATFORM_SCHEMA, BaseNotificationService)
 from .tpclient import *
 
-# Const values
+# Const values.
 MAX_LOGIN_RETRIES = 3
 ROUTER_USERNAME = "admin"
 
-# Config names
+# Config names.
 CONF_ROUTER_IP = 'router_ip'
 CONF_ROUTER_PWD = 'router_pwd'
 
-# Extend PLATFORM_SCHEMA for config params
+# Extend PLATFORM_SCHEMA for config params.
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_ROUTER_IP): cv.string,
     vol.Required(CONF_ROUTER_PWD): cv.string,
 })
 
-# Logger
+# Get the LOGGER.
 _LOGGER = logging.getLogger(__name__)
 
 def get_service(hass, config, discovery_info=None):
@@ -38,18 +38,14 @@ class MR6400SMSNotificationService(BaseNotificationService):
             _LOGGER.error(e)
 
     async def perform_login(self, tpc, websession, password):
-        retries = 0
-        while retries < MAX_LOGIN_RETRIES:
+        for retries in range(MAX_LOGIN_RETRIES):
             try:
                 await tpc.login(websession, ROUTER_USERNAME, password)
-                break  # Successful login, exit retry loop
+                break
             except TPCError as e:
-                retries += 1
-                if retries < MAX_LOGIN_RETRIES:
-                    _LOGGER.warning("Retrying login (%d of %d) due to exception {%s}", retries, MAX_LOGIN_RETRIES, e)
-                    await asyncio.sleep(1)  # Wait before retrying
-                else:
-                    raise TPCError("Login failed due to reaching max retry limit!")
+                if retries < MAX_LOGIN_RETRIES - 1:
+                    _LOGGER.warning("Retrying login (%d of %d) due to exception {%s}", retries + 1, MAX_LOGIN_RETRIES, e)
+                    await asyncio.sleep(1)
 
     async def async_send_message(self, message, **kwargs):
         phone_numbers = kwargs.get(ATTR_TARGET)
