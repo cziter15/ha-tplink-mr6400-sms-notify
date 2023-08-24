@@ -35,11 +35,11 @@ class MR6400:
         encrypted_hex = binascii.hexlify(encrypted_data).decode('utf-8')
         return encrypted_hex
 
-    async def encryptString(self, value, nn, ee):
+    def encryptString(self, value, nn, ee):
         encoded = base64.b64encode(value.encode("utf-8"))
-        return self.encryptDataRSA(encoded, nn, ee)    
+        return self.encryptDataRSA(encoded, nn, ee)
 
-    async def extractKeyPart(self, responseText, pattern):
+    def extractKeyPart(self, responseText, pattern):
         exp = re.compile(pattern, re.IGNORECASE)
         match = exp.search(responseText)
         return match.group(1) if match else None
@@ -53,10 +53,10 @@ class MR6400:
                     if response.status != 200:
                         raise TPCError("Invalid encryption key request, status: " + str(response.status))
                     responseText = await response.text()
-                    ee = await self.extractKeyPart(responseText, r'(?<=ee=")(.{5}(?:\s|.))')
-                    nn = await self.extractKeyPart(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
-                    self._encryptedUsername = await self.encryptString(username, nn, ee)
-                    self._encryptedPassword = await self.encryptString(password, nn, ee)
+                    ee = self.extractKeyPart(responseText, r'(?<=ee=")(.{5}(?:\s|.))')
+                    nn = self.extractKeyPart(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
+                    self._encryptedUsername = self.encryptString(username, nn, ee)
+                    self._encryptedPassword = self.encryptString(password, nn, ee)
         except (TimeoutError, ClientError, TPCError) as e:
             raise TPCError("Could not retrieve encryption key, reason: " +  str(e))
     
@@ -69,13 +69,14 @@ class MR6400:
                 url = self.buildUrl('cgi/login')
                 params = {'UserName': self._encryptedUsername, 'Passwd': self._encryptedPassword, 'Action': '1', 'LoginStatus':'0' }
                 headers = { 'Referer': self._baseurl }
-            async with self.websession.post(url, params=params, headers=headers) as response:
-                if response.status != 200:
-                    raise TPCError("Invalid login request")
-                for cookie in self.websession.cookie_jar:
-                    if cookie["domain"] == self.hostname and cookie.key == 'JSESSIONID':
-                        return
-                raise TPCError("Invalid credentials")
+                async with self.websession.post(url, params=params, headers=headers) as response:
+                    if response.status != 200:
+                        raise TPCError("Invalid login request")
+                    for cookie in self.websession.cookie_jar:
+                        if cookie["domain"] == self.hostname and cookie.key == 'JSESSIONID':
+                            await self.getToken()
+                            return
+                    raise TPCError("Invalid credentials")
         except (TimeoutError, ClientError, TPCError) as e:
             self.websession = None
             raise TPCError("Could not login, reason: " +  str(e))
