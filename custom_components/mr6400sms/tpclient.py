@@ -57,8 +57,8 @@ class MR6400:
                     nn = await self.extractKeyPart(responseText, r'(?<=nn=")(.{255}(?:\s|.))')
                     self._encryptedUsername = await self.encryptString(username, nn, ee)
                     self._encryptedPassword = await self.encryptString(password, nn, ee)
-        except (TimeoutError, ClientError, TPCError):
-            raise TPCError("Could not retrieve encryption key")
+        except (TimeoutError, ClientError, TPCError) as e:
+            raise TPCError("Could not retrieve encryption key, reason: " +  str(e))
     
     async def login(self, websession, username, password):
         try:
