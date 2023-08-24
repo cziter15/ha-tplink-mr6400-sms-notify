@@ -3,7 +3,7 @@
 
 The TP-Link MR6400 SMS Notify, known as **mr6400sms**, is an integration for HomeAssistant HACS that offers a significantly faster alternative to tp-connected. It achieves this speed boost by eliminating js2py-based cryptography while still being based on the reliable tp-connected code.
 
-## Configuration
+## 🛠️ Configuration
 
 To set up the TP-Link MR6400 SMS Notify integration, follow these steps:
 
@@ -19,7 +19,7 @@ notify:
 2. Replace `<IP of the router>` with the actual IP address of your TP-Link MR6400 router.
 3. Replace `<admin password>` with your router's administrator password.
 
-## Using the Service
+## 📲 Using the Service
 Once you've configured the integration, you can call the service to send SMS messages. Here are some key points to note:
 
 - You can send SMS messages to multiple numbers.
@@ -36,7 +36,7 @@ data:
     - number2
 ```
 
-## TODOs (To-Do List)
+## 📋 TODOs (To-Do List)
 I have some improvements and tasks on my radar to enhance this integration:
 
 - Consider implementing outbox cleanup for better management of sent messages.
