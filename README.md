@@ -43,5 +43,3 @@ I have some improvements and tasks on my radar to enhance this integration:
 - Develop a user-friendly UI-based configuration option to simplify setup.
 - Enhance code readability by adding comments and documentation.
 - Address and fix any validation warnings to ensure a seamless user experience.
-
-I am committed to continually improving the TP-Link MR6400 SMS Notify integration to make it even more efficient and user-friendly. Your feedback and contributions are highly appreciated!
