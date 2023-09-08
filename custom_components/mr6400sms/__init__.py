@@ -15,9 +15,7 @@ def get_service(hass, config, discovery_info=None):
 
 class KSSMSNotificationService(BaseNotificationService):
 	def __init__(self, config):
-		self.router_ip = config.get(CONF_ROUTER_IP)
-		self.router_pwd = config.get(CONF_ROUTER_PWD)
-		self.router_client = MR6400(config.get(CONF_ROUTER_IP), ROUTER_USERNAME, config.get(CONF_ROUTER_PWD))
+		self.router_client = MR6400(config.get(CONF_ROUTER_IP), config.get(CONF_ROUTER_USERNAME), config.get(CONF_ROUTER_PWD))
 
 	async def async_send_message(self, message, **kwargs):
 		phone_numbers = kwargs.get(ATTR_TARGET)
