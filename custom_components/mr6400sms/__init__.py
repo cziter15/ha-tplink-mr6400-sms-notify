@@ -4,6 +4,11 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.notify import (ATTR_TARGET, PLATFORM_SCHEMA, BaseNotificationService)
 
+# Config names.
+CONF_ROUTER_IP = 'router_ip'
+CONF_ROUTER_PWD = 'router_pwd'
+CONF_ROUTER_USERNAME = 'router_username'
+
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Required(CONF_ROUTER_IP): cv.string,
 	vol.Required(CONF_ROUTER_PWD): cv.string,
