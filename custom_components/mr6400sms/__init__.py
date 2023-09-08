@@ -1,7 +1,8 @@
-from devices import MR6400
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.notify import (ATTR_TARGET, PLATFORM_SCHEMA, BaseNotificationService)
+
+from devices.mr6400 import MR6400
 
 # Config names.
 CONF_ROUTER_IP = 'router_ip'
