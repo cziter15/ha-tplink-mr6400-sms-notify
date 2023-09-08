@@ -1,4 +1,3 @@
-from vars import *
 from devices import MR6400
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
