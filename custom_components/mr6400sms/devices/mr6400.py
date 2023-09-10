@@ -43,7 +43,7 @@ class MR6400(Router):
 		url = self._buildUrl('cgi/getParm')
 		headers = {'Referer': self._baseurl}
 
-		async with self._websession.post(url, timeout=10, headers=headers) as response:
+		async with self._websession.post(url, timeout=self._requestTimeout, headers=headers) as response:
 			if response.status != 200:
 				raise RouterException(f"Invalid encryption key request because of status {response.status}")
 			
@@ -64,7 +64,7 @@ class MR6400(Router):
 		}
 		headers = { 'Referer': self._baseurl }
 
-		async with self._websession.post(url, params=params, headers=headers, timeout=10) as response:
+		async with self._websession.post(url, params=params, headers=headers, timeout=self._requestTimeout) as response:
 			if response.status != 200:
 				raise RouterException("Invalid login request")
 			
@@ -75,7 +75,7 @@ class MR6400(Router):
 
 		url = self._buildUrl('')
 
-		async with self._websession.get(url,timeout=10) as response:
+		async with self._websession.get(url,timeout=self._requestTimeout) as response:
 			if response.status != 200:
 				raise RouterException("Invalid token request because of status " + str(response.status))
 			
@@ -100,6 +100,6 @@ class MR6400(Router):
 		data = ("[LTE_SMS_SENDNEWMSG#0,0,0,0,0,0#0,0,0,0,0,0]0,3\r\n"f"index=1\r\nto={phone}\r\ntextContent={message}\r\n")
 		headers = {'Referer': self._baseurl, 'TokenID': self._token}
 
-		async with self._websession.post(url, params=params, data=data, headers=headers, timeout=10) as response:
+		async with self._websession.post(url, params=params, data=data, headers=headers, timeout=self._requestTimeout) as response:
 			if response.status != 200:
 				raise RouterException("Failed sending SMS")
