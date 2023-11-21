@@ -3,6 +3,9 @@
 
 The TP-Link MR6400 SMS Notify, known as **mr6400sms**, is an integration for HomeAssistant HACS that offers a significantly faster alternative to tp-connected. It achieves this speed boost by eliminating js2py-based cryptography while still being based on the reliable tp-connected code.
 
+Verified on:
+`Firmware Version:1.11.0 0.9.1 v0001.0 Build 200325 Rel.56677n Hardware Version:TL-MR6400 v4`
+
 ## 🛠️ Configuration
 
 To set up the TP-Link MR6400 SMS Notify integration, follow these steps:
